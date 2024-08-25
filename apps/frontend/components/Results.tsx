@@ -1,14 +1,5 @@
 import { Card, CardContent } from "./ui/card";
 
-// {
-//   "3": [
-//     "dfkdkf"
-//   ],
-//   "34": [
-//     "dfkdkf"
-//   ]
-// }
-
 interface ResultsProps {
   results: {
     [key: string]: string[];
