@@ -1,0 +1,12 @@
+services:
+  refinr-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: refinr-backend
+    environment:
+      - PORT=3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./src:/app/src
