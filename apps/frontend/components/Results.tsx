@@ -1,6 +1,21 @@
 import { Card, CardContent } from "./ui/card";
 
-const Results: React.FC<{ results: any }> = ({ results }) => {
+// {
+//   "3": [
+//     "dfkdkf"
+//   ],
+//   "34": [
+//     "dfkdkf"
+//   ]
+// }
+
+interface ResultsProps {
+  results: {
+    [key: string]: string[];
+  };
+}
+
+const Results: React.FC<ResultsProps> = ({ results }) => {
   return (
     <Card className="mt-8">
       <CardContent className="pt-6">
