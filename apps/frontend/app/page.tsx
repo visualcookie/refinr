@@ -33,13 +33,16 @@ const IndexPage: React.FC = () => {
 
   const createRoom = async (name: string) => {
     try {
-      const response = await fetch("http://localhost:3000/room/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SOCKET_URL}/room/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name }),
+        }
+      );
 
       const data = await response.json();
 

@@ -55,7 +55,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
     if (!id) return;
 
     if (id && username) {
-      socket = io("http://localhost:3000");
+      socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
       console.debug("Connecting to WebSocket server...");
 
       socket.emit("joinRoom", { roomId: id, name: username });
