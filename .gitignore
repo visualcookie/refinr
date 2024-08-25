@@ -20,6 +20,9 @@ test-results/
 playwright/.cache/
 playwright-report/
 
+# Turbo
+.turbo
+
 # Vercel
 .vercel
 
