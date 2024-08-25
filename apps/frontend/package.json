@@ -3,10 +3,10 @@
   "description": "Next.js based frontend for Refinr",
   "version": "0.1.0",
   "author": "Dean Hidri <hello@visualcookie.me>",
-  "license": "The Unlicense",
+  "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
