@@ -58,13 +58,16 @@ export class VotingGateway
       if (userIndex !== -1) {
         // Remove user from room
         roomData[roomId].users.splice(userIndex, 1);
-        this.server.to(roomId).emit('userLeft', this.roomData[roomId].users);
+        this.server.to(roomId).emit('userLeft', roomData[roomId].users);
+        this.logger.debug(
+          `User left, updated user list: ${JSON.stringify(roomData[roomId].users)}`,
+        );
 
         // Remove room if no users left
-        if (this.roomData[roomId].users.length === 0) {
+        if (roomData[roomId].users.length === 0) {
           this.logger.debug(`No users left in room: ${roomId} deleting room`);
-          delete this.roomData[roomId];
-          this.logger.debug(`New room list: ${JSON.stringify(this.roomData)}`);
+          delete roomData[roomId];
+          this.logger.debug(`New room list: ${JSON.stringify(roomData)}`);
         }
 
         break;
@@ -90,10 +93,10 @@ export class VotingGateway
         votingPhase: 'ended',
         votes: {},
       };
-    }
 
-    this.logger.debug(`Room created: ${JSON.stringify(roomData[roomId])}`);
-    this.server.to(roomId).emit('roomCreated', roomData[roomId]);
+      this.logger.debug(`Room created: ${JSON.stringify(roomData[roomId])}`);
+      this.server.to(roomId).emit('roomCreated', roomData[roomId]);
+    }
 
     // Add user to existing room and send updated roomData to all clients in the room
     roomData[roomId].users.push({ clientId: client.id, name: user });
