@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { MenuIcon, XIcon } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 import { Button } from "@/components/ui/button";
 import UserList from "@/components/UserList";
@@ -32,6 +33,7 @@ interface Votes {
 export default function RoomPage({ params }: { params: { id: string } }) {
   const { id } = params;
 
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [user, setUser] = useState<string | null>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [moderatorId, setModeratorId] = useState<string | null>(null);
@@ -157,51 +159,69 @@ export default function RoomPage({ params }: { params: { id: string } }) {
       {!hasUsername ? (
         <FormUsername handleSubmit={handleSubmit} />
       ) : (
-        <div className="flex h-screen bg-background">
-          <div className="w-64 p-4 border-r bg-muted/40">
-            <UserList users={transformedUsers} />
-          </div>
-          <div className="flex-1 p-4 overflow-auto">
-            <h1 className="text-2xl font-bold mb-4">Story Poker</h1>
+        <div className="flex flex-col h-screen bg-background">
+          <header className="flex justify-between items-center p-4 border-b dark:border-gray-700">
+            <h1 className="text-2xl font-bold dark:text-white">Refinr</h1>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden"
+              >
+                {sidebarOpen ? <XIcon /> : <MenuIcon />}
+              </Button>
+            </div>
+          </header>
+          <div className="flex flex-1 overflow-hidden">
+            <aside
+              className={`fixed inset-y-0 left-0 z-50 w-64 md:w-64 p-4 border-r bg-background transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0 dark:border-gray-700`}
+            >
+              <UserList users={transformedUsers} />
+            </aside>
 
-            {isModerator && (
-              <Tools
-                votingPhase={votingPhase}
-                onStartVoting={() => handleVotingPhaseChange("voting")}
-                onEndVoting={() => handleVotingPhaseChange("results")}
-                onResetVotes={handleResetVoting}
-              />
-            )}
+            <main
+              className={`flex-1 p-4 overflow-y-auto transition-all duration-200 ${sidebarOpen ? "md:ml-64" : ""}`}
+            >
+              {isModerator && (
+                <Tools
+                  votingPhase={votingPhase}
+                  onStartVoting={() => handleVotingPhaseChange("voting")}
+                  onEndVoting={() => handleVotingPhaseChange("results")}
+                  onResetVotes={handleResetVoting}
+                />
+              )}
 
-            {!isModerator && votingPhase === "ended" && (
-              <p className="text-muted-foreground mb-6">
-                The voting phase has ended or not started yet.
-              </p>
-            )}
-
-            {votingPhase === "voting" && !isModerator && (
-              <>
-                <p className="text-muted-foreground mb-6">
-                  Select a card to estimate the story points:
+              {!isModerator && votingPhase === "ended" && (
+                <p className="text-muted-foreground mb-6 dark:text-gray-300">
+                  The voting phase has ended or not started yet.
                 </p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                  {storyPoints.map((point) => (
-                    <Button
-                      key={point}
-                      variant={selectedCard === point ? "default" : "outline"}
-                      className={`h-24 text-2xl font-bold ${
-                        selectedCard === point ? "ring-2 ring-primary" : ""
-                      }`}
-                      onClick={() => handleVote(point)}
-                    >
-                      {point}
-                    </Button>
-                  ))}
-                </div>
-              </>
-            )}
+              )}
 
-            {votingPhase === "results" && <Results results={groupedVotes} />}
+              {votingPhase === "voting" && !isModerator && (
+                <>
+                  <p className="text-muted-foreground mb-6 dark:text-gray-300">
+                    Select a card to estimate the story points:
+                  </p>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                    {storyPoints.map((point) => (
+                      <Button
+                        key={point}
+                        variant={selectedCard === point ? "default" : "outline"}
+                        className={`h-20 sm:h-24 text-xl sm:text-2xl font-bold ${
+                          selectedCard === point ? "ring-2 ring-primary" : ""
+                        } dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600`}
+                        onClick={() => handleVote(point)}
+                      >
+                        {point}
+                      </Button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {votingPhase === "results" && <Results results={groupedVotes} />}
+            </main>
           </div>
         </div>
       )}

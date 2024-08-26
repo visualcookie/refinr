@@ -16,9 +16,11 @@ const Tools: React.FC<Props> = ({
   onResetVotes,
 }) => {
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 dark:bg-gray-800">
       <CardContent className="pt-6">
-        <h2 className="text-xl font-bold mb-4">Moderator Controls</h2>
+        <h2 className="text-xl font-bold mb-4 dark:text-white">
+          Moderator Controls
+        </h2>
         <div className="flex gap-4">
           <Button onClick={onStartVoting} disabled={votingPhase === "voting"}>
             <PlayIcon className="mr-2 h-4 w-4" /> Start Voting
