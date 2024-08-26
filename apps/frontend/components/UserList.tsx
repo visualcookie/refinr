@@ -1,14 +1,11 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CheckIcon, CrownIcon } from "lucide-react";
 
-type User = {
-  id: string;
-  name: string;
-  isModerator?: boolean;
-  votes?: string;
+type UserListProps = {
+  users: any;
 };
 
-const UserList: React.FC<{ users: User[] }> = ({ users }) => {
+const UserList: React.FC<UserListProps> = ({ users }) => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Participants</h2>

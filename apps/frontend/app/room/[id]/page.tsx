@@ -25,8 +25,6 @@ const storyPoints = [
   "?",
 ];
 
-interface Events {}
-
 interface Votes {
   [key: string]: string;
 }
@@ -34,8 +32,8 @@ interface Votes {
 export default function RoomPage({ params }: { params: { id: string } }) {
   const { id } = params;
 
+  const [user, setUser] = useState<string | null>(null);
   const [users, setUsers] = useState<any[]>([]);
-  const [isModerator, setIsModerator] = useState<boolean>(false);
   const [moderatorId, setModeratorId] = useState<string | null>(null);
   const [votingPhase, setVotingPhase] = useState<
     "ended" | "voting" | "results"
@@ -43,54 +41,47 @@ export default function RoomPage({ params }: { params: { id: string } }) {
   const [votes, setVotes] = useState<Votes>({});
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [hasUsername, setHasUsername] = useState<boolean>(false);
-  const username = localStorage.getItem("name") ?? "";
 
   useEffect(() => {
-    if (username) {
+    const getUserfromLocalStorage = localStorage.getItem("name")
+      ? localStorage.getItem("name")
+      : null;
+
+    if (getUserfromLocalStorage) {
       setHasUsername(true);
+      setUser(getUserfromLocalStorage);
     }
-  }, [username]);
+  }, []);
 
   useEffect(() => {
     if (!id) return;
 
-    if (id && username) {
+    if (id && hasUsername) {
       socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
       console.debug("Connecting to WebSocket server...");
 
-      socket.emit("joinRoom", { roomId: id, name: username });
+      socket.emit("joinRoom", { roomId: id, user });
 
-      // Receive room users
-      socket.on("roomUsers", (socketUsers: any[]) => {
-        console.debug("Received users list:", socketUsers);
-        setUsers(socketUsers);
+      socket.on("userJoined", (roomData) => {
+        console.debug("userJoined", roomData);
+        setUsers(roomData.users);
+        setModeratorId(roomData.moderatorId);
+        setVotingPhase(roomData.votingPhase);
+        setVotes(roomData.votes);
       });
 
-      // Receive room moderator
-      socket.on("moderator", (moderatorId: string) => {
-        console.debug("Moderator ID:", moderatorId);
-        setModeratorId(moderatorId);
-        setIsModerator(socket.id === moderatorId);
+      socket.on("userLeft", (userList) => {
+        setUsers(userList);
       });
 
-      // Receive voting phase
-      socket.on("votingPhase", (phase: "ended" | "voting" | "results") => {
-        console.debug("Sync voting phase:", phase);
-        setVotingPhase(phase);
+      socket.on("userVoted", (roomVotes) => {
+        setVotes(roomVotes);
       });
 
-      // Receive voting results
-      socket.on("votingResults", (results) => {
-        console.debug("Voting results:", results);
-        setVotes(results);
+      socket.on("changedVotingPhase", (roomData) => {
+        setVotingPhase(roomData.votingPhase);
       });
 
-      // Receive vote from user
-      socket.on("voteReceived", (receivedVotes) => {
-        setVotes(receivedVotes);
-      });
-
-      // Receive reset votes
       socket.on("resetVotes", () => {
         setVotes({});
         setSelectedCard(null);
@@ -101,27 +92,25 @@ export default function RoomPage({ params }: { params: { id: string } }) {
         console.debug("Disconnected from WebSocket server");
       };
     }
-  }, [id, username]);
+  }, [hasUsername, id, user]);
 
-  const handleStartVoting = () => {
-    socket.emit("startVoting", id);
-  };
-
-  const handleEndVoting = () => {
-    socket.emit("endVoting", id);
+  const handleVotingPhaseChange = (phase: "ended" | "voting" | "results") => {
+    socket.emit("changeVotingPhase", { roomId: id, votingPhase: phase });
   };
 
   const handleResetVoting = () => {
-    socket.emit("resetVoting", id);
+    socket.emit("changeVotingPhase", { roomId: id, votingPhase: "ended" });
+    socket.emit("resetVotes", { roomId: id });
   };
 
   const handleVote = (voteValue: string) => {
-    socket.emit("giveVote", { roomId: id, vote: voteValue });
     setSelectedCard(voteValue);
+    socket.emit("vote", { roomId: id, vote: voteValue });
   };
 
   const handleSubmit = (data: any) => {
     localStorage.setItem("name", data.name);
+    setUser(data.name);
     setHasUsername(true);
   };
 
@@ -129,8 +118,8 @@ export default function RoomPage({ params }: { params: { id: string } }) {
     const groupedVotes: { [key: string]: string[] } = {};
     const clientIdToNameMap: { [clientId: string]: string } = {};
 
-    users.forEach((user) => {
-      clientIdToNameMap[user.clientId] = user.name;
+    users.forEach((u) => {
+      clientIdToNameMap[u.clientId] = u.name;
     });
 
     for (const socketId in votes) {
@@ -150,12 +139,18 @@ export default function RoomPage({ params }: { params: { id: string } }) {
     return groupedVotes;
   }, [votes, users]);
 
-  // TODO: Let the socket return this logic
-  const transformedUsers = users.map((user) => ({
-    ...user,
-    isModerator: user.clientId === moderatorId,
-    votes: votes[user.clientId],
-  }));
+  const transformedUsers = useMemo(() => {
+    return users.map((u) => ({
+      ...u,
+      isModerator: u.clientId === moderatorId,
+      votes: votes[u.clientId],
+    }));
+  }, [moderatorId, users, votes]);
+
+  const isModerator = useMemo(() => {
+    const currentUser = transformedUsers.find((u) => u.name === user);
+    return currentUser?.isModerator;
+  }, [transformedUsers, user]);
 
   return (
     <>
@@ -172,8 +167,8 @@ export default function RoomPage({ params }: { params: { id: string } }) {
             {isModerator && (
               <Tools
                 votingPhase={votingPhase}
-                onStartVoting={handleStartVoting}
-                onEndVoting={handleEndVoting}
+                onStartVoting={() => handleVotingPhaseChange("voting")}
+                onEndVoting={() => handleVotingPhaseChange("results")}
                 onResetVotes={handleResetVoting}
               />
             )}
