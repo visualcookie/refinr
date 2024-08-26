@@ -1,8 +1,15 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CheckIcon, CrownIcon } from "lucide-react";
 
+interface User {
+  clientId: string;
+  name: string;
+  isModerator?: boolean;
+  votes?: string;
+}
+
 type UserListProps = {
-  users: any;
+  users: User[];
 };
 
 const UserList: React.FC<UserListProps> = ({ users }) => {
@@ -10,7 +17,7 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Participants</h2>
       {users.map((user) => (
-        <div key={user.id} className="flex items-center gap-2">
+        <div key={user.clientId} className="flex items-center gap-2">
           <div className="relative">
             <Avatar>
               <AvatarFallback>
