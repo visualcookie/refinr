@@ -16,11 +16,8 @@ const Tools: React.FC<Props> = ({
   onResetVotes,
 }) => {
   return (
-    <Card className="mb-6 dark:bg-gray-800">
+    <Card className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 mb-6">
       <CardContent className="pt-6">
-        <h2 className="text-xl font-bold mb-4 dark:text-white">
-          Moderator Controls
-        </h2>
         <div className="flex gap-4">
           <Button onClick={onStartVoting} disabled={votingPhase === "voting"}>
             <PlayIcon className="mr-2 h-4 w-4" /> Start Voting
@@ -28,7 +25,7 @@ const Tools: React.FC<Props> = ({
           <Button onClick={onEndVoting} disabled={votingPhase !== "voting"}>
             <TimerIcon className="mr-2 h-4 w-4" /> Show results
           </Button>
-          <Button onClick={onResetVotes}>
+          <Button onClick={onResetVotes} className="ml-auto">
             <RotateCcwIcon className="mr-2 h-4 w-4" /> Reset
           </Button>
         </div>

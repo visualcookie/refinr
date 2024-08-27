@@ -59,33 +59,39 @@ const IndexPage: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <div className="w-96 mx-auto mt-8">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col space-y-2"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>How should I call you?</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {!form.formState.isSubmitting
-                ? "Start session"
-                : "Starting session..."}
-            </Button>
-          </form>
-        </Form>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-md mx-auto">
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <h1 className="text-2xl font-semibold">Refinr</h1>
+        </div>
+        <div className="bg-white dark:bg-gray-950 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 p-6 sm:p-8">
+          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+            Enter your name to start a new Refinr session.
+          </p>
+
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col space-y-2"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                Start a session
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );

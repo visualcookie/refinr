@@ -8,6 +8,7 @@ import UserList from "@/components/UserList";
 import Tools from "@/components/Tools";
 import Results from "@/components/Results";
 import FormUsername from "@/components/FormUsername";
+import { ModeToggle } from "@/components/ModeToggle";
 
 let socket: Socket;
 
@@ -159,10 +160,11 @@ export default function RoomPage({ params }: { params: { id: string } }) {
       {!hasUsername ? (
         <FormUsername handleSubmit={handleSubmit} />
       ) : (
-        <div className="flex flex-col h-screen bg-background">
-          <header className="flex justify-between items-center p-4 border-b dark:border-gray-700">
+        <div className="flex flex-col h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+          <header className="flex justify-between items-center p-4 border-b dark:border-gray-800">
             <h1 className="text-2xl font-bold dark:text-white">Refinr</h1>
             <div className="flex items-center gap-4">
+              <ModeToggle />
               <Button
                 variant="ghost"
                 size="icon"
@@ -175,7 +177,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
           </header>
           <div className="flex flex-1 overflow-hidden">
             <aside
-              className={`fixed inset-y-0 left-0 z-50 w-64 md:w-64 p-4 border-r bg-background transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0 dark:border-gray-700`}
+              className={`fixed inset-y-0 left-0 z-50 w-64 md:w-64 p-4 border-r bg-background transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0 dark:border-gray-800`}
             >
               <UserList users={transformedUsers} />
             </aside>

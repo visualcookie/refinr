@@ -8,7 +8,7 @@ interface ResultsProps {
 
 const Results: React.FC<ResultsProps> = ({ results }) => {
   return (
-    <Card className="mt-8 dark:bg-gray-800">
+    <Card className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 mt-6">
       <CardContent className="pt-6">
         <h2 className="text-xl font-bold mb-4 dark:text-white">
           Voting Results
